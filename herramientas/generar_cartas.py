@@ -6,7 +6,7 @@ especie) y el marcador AR que sirve de ancla al modelo 3D.
 
 Uso:
     python3 herramientas/generar_cartas.py
-    # opcional: BASE_URL=https://tu-usuario.github.io/catalogo-ar python3 herramientas/generar_cartas.py
+    # opcional: BASE_URL=https://adrixn1140.github.io/catalogo-ar python3 herramientas/generar_cartas.py
 """
 import json
 import os
@@ -14,7 +14,7 @@ import qrcode
 from qrcode.image.svg import SvgPathImage
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_URL = os.environ.get("BASE_URL", "https://tu-usuario.github.io/catalogo-ar/index.html")
+BASE_URL = os.environ.get("BASE_URL", "https://adrixn1140.github.io/catalogo-ar/index.html")
 SALIDA = os.path.join(RAIZ, "cartas", "cartas.html")
 
 
