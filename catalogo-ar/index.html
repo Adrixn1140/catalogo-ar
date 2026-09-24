@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#10231a">
+<title>Catálogo AR · Serpientes de Colombia</title>
+<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@master/aframe/build/aframe-ar.js"></script>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🐍</text></svg>'>
+</head>
+<body>
+
+<!-- ==================== ESCENA AR ==================== -->
+<a-scene id="escenaAr" embedded
+  arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;"
+  renderer="antialias: true; alpha: true;"
+  vr-mode-ui="enabled: false">
+
+  <a-assets timeout="40000">
+    <a-asset-item id="m-coral"     src="modelos/coral.glb"></a-asset-item>
+    <a-asset-item id="m-cascabel"  src="modelos/cascabel.glb"></a-asset-item>
+    <a-asset-item id="m-mapana"    src="modelos/mapana.glb"></a-asset-item>
+    <a-asset-item id="m-verrugosa" src="modelos/verrugosa.glb"></a-asset-item>
+    <a-asset-item id="m-rombifera" src="modelos/rombifera.glb"></a-asset-item>
+    <a-asset-item id="m-boa"       src="modelos/boa.glb"></a-asset-item>
+    <a-asset-item id="m-arcoiris"  src="modelos/arcoiris.glb"></a-asset-item>
+    <a-asset-item id="m-lora"      src="modelos/lora.glb"></a-asset-item>
+  </a-assets>
+
+  <a-marker id="mk-coral"     preset="custom" type="pattern" url="patterns/coral.patt">
+    <a-entity id="ent-coral"     class="snake-model" data-esp="coral"     gltf-model="#m-coral"     position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-cascabel"  preset="custom" type="pattern" url="patterns/cascabel.patt">
+    <a-entity id="ent-cascabel"  class="snake-model" data-esp="cascabel"  gltf-model="#m-cascabel"  position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-mapana"    preset="custom" type="pattern" url="patterns/mapana.patt">
+    <a-entity id="ent-mapana"    class="snake-model" data-esp="mapana"    gltf-model="#m-mapana"    position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-verrugosa" preset="custom" type="pattern" url="patterns/verrugosa.patt">
+    <a-entity id="ent-verrugosa" class="snake-model" data-esp="verrugosa" gltf-model="#m-verrugosa" position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-rombifera" preset="custom" type="pattern" url="patterns/rombifera.patt">
+    <a-entity id="ent-rombifera" class="snake-model" data-esp="rombifera" gltf-model="#m-rombifera" position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-boa"       preset="custom" type="pattern" url="patterns/boa.patt">
+    <a-entity id="ent-boa"       class="snake-model" data-esp="boa"       gltf-model="#m-boa"       position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-arcoiris"  preset="custom" type="pattern" url="patterns/arcoiris.patt">
+    <a-entity id="ent-arcoiris"  class="snake-model" data-esp="arcoiris"  gltf-model="#m-arcoiris"  position="0 0.004 0"></a-entity>
+  </a-marker>
+  <a-marker id="mk-lora"      preset="custom" type="pattern" url="patterns/lora.patt">
+    <a-entity id="ent-lora"      class="snake-model" data-esp="lora"      gltf-model="#m-lora"      position="0 0.004 0"></a-entity>
+  </a-marker>
+
+  <a-entity light="type: hemisphere; intensity: 0.75" color="#ffffff" groundColor="#3a2f22"></a-entity>
+  <a-entity light="type: directional; intensity: 0.85" position="0.5 2 1.5"></a-entity>
+  <a-camera-static></a-camera-static>
+</a-scene>
+
+<!-- ==================== INTERFAZ ==================== -->
+<div id="ui">
+
+  <header id="barraSuperior">
+    <button id="btnMenu" aria-label="Lista de especies">☰</button>
+    <div id="tituloCaja">
+      <h1 id="titulo">Serpientes de Colombia</h1>
+      <span id="subtitulo">Catálogo en realidad aumentada</span>
+    </div>
+    <span id="badge" class="oculto"></span>
+  </header>
+
+  <div id="vista3d-btncaja">
+    <button id="btnVista3d">Vista sin AR</button>
+  </div>
+
+  <section id="panelInfo" class="oculto">
+    <div id="encabezadoEspecie">
+      <h2 id="nomComun"></h2>
+      <p id="nomCientifico"></p>
+    </div>
+    <dl id="ficha"></dl>
+    <button id="btnCerrarPanel">Cerrar ficha</button>
+  </section>
+
+  <div id="controles" class="oculto">
+    <button id="btnSubir"   data-acc="subir"  aria-label="Acercar">+</button>
+    <button id="btnBajar"   data-acc="bajar"  aria-label="Alejar">−</button>
+    <button id="btnIzq"     data-acc="izq"    aria-label="Rotar izq">⟲</button>
+    <button id="btnDer"     data-acc="der"    aria-label="Rotar der">⟳</button>
+  </div>
+
+  <div id="pista" class="oculto">
+    <span id="pistaTexto">Apunta la cámara a la carta para ver la serpiente en 3D.</span>
+  </div>
+
+  <div id="cargando"><div class="spinner"></div><p>Cargando…</p></div>
+
+  <div id="errorCarga" class="oculto">
+    <h3>No se pudo iniciar la cámara</h3>
+    <p id="errorCargaMsg"></p>
+    <button id="btnReintentar">Permitir cámara e intentar de nuevo</button>
+  </div>
+
+</div>
+
+<!-- ==================== MENÚ DE ESPECIES ==================== -->
+<div id="menuEspecies" class="oculto">
+  <div id="menuCard">
+    <h2>Elige una especie</h2>
+    <p class="menuPie">(o escanea directamente una carta con el celular)</p>
+    <div id="listaEspecies"></div>
+    <button id="btnCerrarMenu">Cerrar</button>
+  </div>
+</div>
+
+<!-- ==================== VISOR 3D SIN AR ==================== -->
+<div id="visor3d" class="oculto open">
+  <div id="visorCaja">
+    <div id="visorCabecera">
+      <span id="visorNombre">Vista 3D</span>
+      <select id="visorSeleccion"></select>
+      <span id="visorBadge"></span>
+      <button id="visorCerrar">✕</button>
+    </div>
+    <canvas id="visorCanvas"></canvas>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+const estados = {
+  especies: [],
+  activa: null,
+  modeloActivo: null,
+};
+
+const $ = (sel) => document.querySelector(sel);
+
+function escapar(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function cargarDatos() {
+  return fetch('datos.json')
+    .then((r) => { if (!r.ok) throw new Error('No se pudo leer datos.json'); return r.json(); })
+    .then((d) => { estados.especies = d; })
+    .catch((e) => { console.error(e); });
+}
+
+function ordenDeLaColeccion() {
+  return ['coral', 'cascabel', 'mapana', 'verrugosa', 'rombifera', 'boa', 'arcoiris', 'lora'];
+}
+
+function especiePorId(id) {
+  return estados.especies.find((e) => e.id === id);
+}
+
+function inicializarUi() {
+  const menu = $('#listaEspecies');
+  ordenDeLaColeccion().forEach((id) => {
+    const e = especiePorId(id);
+    if (!e) return;
+    const btn = document.createElement('button');
+    btn.className = 'fila-especie';
+    btn.dataset.id = e.id;
+    btn.style.setProperty('--accent', e.color || '#2a9d2a');
+    btn.innerHTML =
+      '<span class="fila-nombre">' + escapar(e.nombre) + '</span>' +
+      '<span class="fila-badge ' + (e.venenosa ? 'ven' : 'no-ven') + '">' +
+      (e.venenosa ? 'VENENOSA' : 'NO VENENOSA') + '</span>';
+    btn.addEventListener('click', () => { elegirEspecie(e.id); });
+    menu.appendChild(btn);
+  });
+
+  const sel = $('#visorSeleccion');
+  ordenDeLaColeccion().forEach((id) => {
+    const e = especiePorId(id);
+    if (!e) return;
+    const opt = document.createElement('option');
+    opt.value = e.id;
+    opt.textContent = e.nombre;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => visorCargar(sel.value));
+}
+
+function completarFicha(e) {
+  $('#nomComun').textContent = e.nombre;
+  $('#nomCientifico').textContent = e.cientifico;
+  const pts = [
+    ['Familia', e.familia],
+    ['¿Es venenosa?', e.venenosa ? 'SÍ — ' + e.peligro : 'NO — ' + e.peligro],
+    ['Hábitat', e.habitat],
+    ['Dónde vive en Colombia', e.distribucion],
+    ['Tamaño', e.tamano],
+    ['Alimentación', e.dieta],
+    ['Reproducción', e.reproduccion],
+    ['Dato interesante', e.dato],
+  ];
+  $('#ficha').innerHTML = pts.map(([k, v]) =>
+    '<div class="fila-ficha"><dt>' + escapar(k) + '</dt><dd>' + escapar(v) + '</dd></div>').join('');
+}
+
+function elegirEspecie(id) {
+  const e = especiePorId(id);
+  if (!e) return;
+  estados.activa = id;
+  document.querySelector('#menuEspecies').classList.add('oculto');
+  history.replaceState(null, '', '#' + id);
+  completarFicha(e);
+  $('#titulo').textContent = e.nombre;
+  $('#subtitulo').textContent = e.cientifico;
+  const badge = $('#badge');
+  badge.textContent = e.venenosa ? 'VENENOSA' : 'NO VENENOSA';
+  badge.className = e.venenosa ? 'ven' : 'no-ven';
+  badge.style.setProperty('--accent', e.color || '#2a9d2a');
+  $('#badge').classList.remove('oculto');
+  $('#controles').classList.remove('oculto');
+  $('#panelInfo').classList.remove('oculto');
+  $('#pista').classList.remove('oculto');
+  estados.modeloActivo = document.querySelector('#ent-' + id);
+}
+
+function activarDesdeHash() {
+  const id = location.hash ? location.hash.slice(1) : '';
+  if (id && especiePorId(id)) { elegirEspecie(id); visorSeleccionar(id); return true; }
+  $('#menuEspecies').classList.remove('oculto');
+  return false;
+}
+
+function conectarMarcadores() {
+  document.querySelectorAll('.snake-model').forEach((ent) => {
+    const mk = ent.closest('a-marker');
+    if (!mk) return;
+    const id = ent.getAttribute('data-esp');
+    mk.addEventListener('markerFound', () => {
+      estados.activa = id;
+      estados.modeloActivo = ent;
+      const e = especiePorId(id);
+      if (!e) return;
+      completarFicha(e);
+      $('#titulo').textContent = e.nombre;
+      $('#subtitulo').textContent = e.cientifico;
+      const badge = $('#badge');
+      badge.textContent = e.venenosa ? 'VENENOSA' : 'NO VENENOSA';
+      badge.className = e.venenosa ? 'ven' : 'no-ven';
+      $('#badge').classList.remove('oculto');
+      $('#controles').classList.remove('oculto');
+      $('#panelInfo').classList.remove('oculto');
+      $('#menuEspecies').classList.add('oculto');
+      $('#pista').classList.remove('oculto');
+      $('#pistaTexto').textContent = 'Serpiente detectada sobre la carta. Usa los botones para rotar y acercar.';
+    });
+  });
+}
+
+function rotar(v) {
+  if (!estados.modeloActivo) return;
+  const r = estados.modeloActivo.getAttribute('rotation');
+  estados.modeloActivo.setAttribute('rotation', {
+    x: r.x, y: r.y + v, z: r.z,
+  });
+}
+
+function escalar(f) {
+  if (!estados.modeloActivo) return;
+  const s = estados.modeloActivo.getAttribute('scale');
+  const n = Math.min(3, Math.max(0.3, s.x * f));
+  estados.modeloActivo.setAttribute('scale', { x: n, y: n, z: n });
+}
+
+function controladorControles() {
+  $('[data-acc="izq"]').addEventListener('click', () => rotar(15));
+  $('[data-acc="der"]').addEventListener('click', () => rotar(-15));
+  $('[data-acc="subir"]').addEventListener('click', () => escalar(1.15));
+  $('[data-acc="bajar"]').addEventListener('click', () => escalar(1 / 1.15));
+}
+
+function manejarHash() {
+  window.addEventListener('hashchange', () => {
+    const id = location.hash ? location.hash.slice(1) : '';
+    if (id && especiePorId(id)) elegirEspecie(id);
+  });
+}
+
+function erroresAR() {
+  const escena = $('#escenaAr');
+  const err = $('#errorCarga');
+  function mostrar(e) {
+    err.classList.remove('oculto');
+    $('#errorCargaMsg').textContent =
+      'Revisa que la URL sea https (GitHub Pages) y que el navegador tenga permiso para usar la cámara. Detalle: ' + e;
+  }
+  escena.addEventListener('camera-error', (e) => mostrar(e.detail || 'cámara no disponible'));
+  escena.addEventListener('arjs-video-error', () => mostrar('no se pudo acceder a la cámara'));
+  escena.addEventListener('error', (e) => { if (e.detail && String(e.detail).indexOf('arjs') !== -1) mostrar(e.detail); });
+  $('#btnReintentar').addEventListener('click', () => { const esc = $('#escenaAr'); const cam = esc.querySelector('a-camera') || esc.querySelector('video'); if (cam) { esc.removeChild(cam); } if (window.arController) { window.arController.dispose && window.arController.dispose(); } location.reload(); });
+}
+
+// ============ VISOR 3D SIN AR (three.js) ============
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const visor = {
+  renderer: null,
+  escena: null,
+  camara: null,
+  orbit: null,
+  modelo: null,
+  id: null,
+  hl: null,
+};
+
+function visorSeleccionar(id) { $('#visorSeleccion').value = id; }
+
+function visorIniciar() {
+  const canvas = $('#visorCanvas');
+  visor.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  visor.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  visor.escena = new THREE.Scene();
+  visor.escena.background = new THREE.Color(0x0e1a16);
+  visor.camara = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
+  visor.camara.position.set(1.6, 1.1, 2.2);
+  visor.orbit = new OrbitControls(visor.camara, canvas);
+  visor.orbit.enableDamping = true;
+  visor.orbit.autoRotate = true;
+  visor.orbit.autoRotateSpeed = 2.5;
+  visor.orbit.target.set(0, 0.1, 0);
+  visor.escena.add(new THREE.HemisphereLight(0xffffff, 0x33504a, 1.1));
+  const dl = new THREE.DirectionalLight(0xffffff, 1.4);
+  dl.position.set(2, 4, 3);
+  visor.escena.add(dl);
+  visor.hl = new THREE.HemisphereLight(0x111111, 0x000000, 0.4);
+  visor.escena.add(visor.hl);
+  const rejilla = new THREE.GridHelper(3, 12, 0x2a4a3f, 0x1c332b);
+  visor.escena.add(rejilla);
+
+  visor.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  animate();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (!visor.renderer) return;
+  visor.orbit.update();
+  visor.renderer.render(visor.escena, visor.camara);
+}
+
+function visorCargar(id) {
+  const e = especiePorId(id);
+  if (!e) return;
+  visor.id = id;
+  $('#visorNombre').textContent = e.nombre + ' — ' + e.cientifico;
+  $('#visorBadge').textContent = e.venenosa ? 'VENENOSA' : 'NO VENENOSA';
+  $('#visorBadge').className = e.venenosa ? 'ven' : 'no-ven';
+  if (visor.modelo) { visor.escena.remove(visor.modelo); visor.modelo.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); visor.modelo = null; }
+  const loader = new GLTFLoader();
+  loader.load('modelos/' + id + '.glb', (g) => {
+    const obj = g.scene || g.scenes[0];
+    obj.traverse((o) => { if (o.isMesh) { o.castShadow = true; } });
+    const box = new THREE.Box3().setFromObject(obj);
+    const centro = box.getCenter(new THREE.Vector3());
+    const tam = box.getSize(new THREE.Vector3());
+    const esc = 1.6 / Math.max(tam.x, tam.y, tam.z, 0.001);
+    obj.scale.setScalar(esc);
+    obj.position.set(-centro.x * esc, -centro.y * esc, -centro.z * esc);
+    visor.modelo = obj;
+    visor.escena.add(obj);
+  }, undefined, (err) => { console.error('visor err', err); });
+}
+
+function alternarVisor(abrir) {
+  const v = $('#visor3d');
+  v.classList.toggle('oculto', !abrir);
+  if (abrir) {
+    visorIniciar();
+    if (estados.activa && especiePorId(estados.activa)) visorCargar(estados.activa);
+    else visorCargar($('#visorSeleccion').value);
+    v.classList.add('open');
+    visor.renderer && visor.renderer.setSize(v.querySelector('#visorCanvas').clientWidth, v.querySelector('#visorCanvas').clientHeight);
+  }
+}
+
+window.addEventListener('resize', () => {
+  if (visor.renderer) visor.renderer.setSize($('#visorCanvas').clientWidth, $('#visorCanvas').clientHeight);
+});
+
+// ============ arranque ============
+setTimeout(() => $('#cargando').classList.add('oculto'), 4000);
+$('#escenaAr').addEventListener('loaded', () => $('#cargando').classList.add('oculto'));
+
+(async function main() {
+  await cargarDatos();
+  inicializarUi();
+  conectarMarcadores();
+  controladorControles();
+  manejarHash();
+
+  $('#btnMenu').addEventListener('click', () => $('#menuEspecies').classList.toggle('oculto'));
+  $('#btnCerrarMenu').addEventListener('click', () => $('#menuEspecies').classList.add('oculto'));
+  $('#btnCerrarPanel').addEventListener('click', () => $('#panelInfo').classList.add('oculto'));
+  $('#btnVista3d').addEventListener('click', () => alternarVisor(true));
+  $('#visorCerrar').addEventListener('click', () => alternarVisor(false));
+
+  const escenaAr = $('#escenaAr');
+  activarDesdeHash();
+  erroresAR();
+  window.__app = { estado: estados, visor: visor };
+})();
+</script>
+
+</body>
+</html>
