@@ -124,6 +124,6 @@ revisar los modelos.
 
 ## Recursos
 
-- A-Frame 1.4.0: `https://aframe.io/releases/1.4.0/aframe.min.js`
-- AR.js (master): `https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@master/aframe/build/aframe-ar.js`
+- A-Frame 1.2.0: `https://aframe.io/releases/1.2.0/aframe.min.js`
+- AR.js 3.4.8: `https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.8/aframe/build/aframe-ar.js`
 - three.js 0.160 (visor 3D, con importmap)
